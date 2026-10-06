@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com; form-action 'self'; base-uri 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>HappyLight · ретро-гірлянди, магазин у Дніпрі</title>
 <meta name="description" content="Ретро-гірлянди власного виробництва для терас, дворів і закладів. Зберіть свою гірлянду онлайн, відправка Новою Поштою за 1–3 робочі дні, оплата при отриманні.">
@@ -16,9 +16,9 @@
 <meta property="og:url" content="https://example.invalid/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1020'/%3E%3Ccircle cx='32' cy='28' r='15' fill='%23f2b45a'/%3E%3Crect x='25' y='42' width='14' height='10' rx='2' fill='%23b5b7d1'/%3E%3C/svg%3E">
 <link rel="preload" as="image" href="assets/hero-ending.jpg">
-<link rel="stylesheet" href="assets/css/site.css?v=4">
-<script src="assets/js/app.js?v=4" defer></script>
-<script src="assets/js/film.js?v=4" defer></script>
+<link rel="stylesheet" href="assets/css/site.css?v=6">
+<script src="assets/js/app.js?v=6" defer></script>
+<script src="assets/js/film.js?v=6" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"HappyLight","description":"Ретро-гірлянди власного виробництва","telephone":"+380637100636","address":{"@type":"PostalAddress","streetAddress":"вул. Юрія Кондратюка, 4","addressLocality":"Дніпро","postalCode":"49000","addressCountry":"UA"},"sameAs":["https://www.instagram.com/happylight.in.ua/","https://t.me/zhukbogdan"]}</script>
 </head>
 <body>
@@ -155,10 +155,24 @@
       </div>
       <div class="tiles" data-tiles aria-label="Розділи каталогу"></div>
       <div class="chips" role="toolbar" aria-label="Категорії" data-chips></div>
-      <div class="sortbar"><label for="sort">Сортування</label><select id="sort" data-sort><option value="rec">Спочатку вуличні, дешевші вище</option><option value="asc">Ціна: від дешевших</option><option value="desc">Ціна: від дорожчих</option><option value="name">За назвою</option></select></div>
+      <div class="sortbar"><button class="cats-back" type="button" data-cats-back>← Усі розділи</button><label for="sort">Сортування</label><select id="sort" data-sort><option value="rec">Спочатку вуличні, дешевші вище</option><option value="asc">Ціна: від дешевших</option><option value="desc">Ціна: від дорожчих</option><option value="name">За назвою</option></select></div>
       <div class="groups" data-grid aria-live="polite"></div>
       <noscript><p class="empty">Щоб користуватися магазином, увімкніть JavaScript або напишіть нам у Telegram: t.me/zhukbogdan</p></noscript>
       <p class="empty" data-empty hidden>Каталог не завантажився. Оновіть сторінку або напишіть нам у Telegram.</p>
+    </div>
+  </section>
+
+  <!-- 3а. Відеоогляд від HappyLight (YouTube клієнта) -->
+  <section class="s vid" id="video" data-reveal>
+    <div class="wrap">
+      <span class="kicker r">Відеоогляд</span>
+      <h2 class="r">Подивіться гірлянду в роботі.</h2>
+      <p class="lede r">Детальний огляд ретро-гірлянди для вулиці й дому від HappyLight.</p>
+      <div class="vbox r" data-yt="RSY_4CGofCc">
+        <img src="assets/img/work-terrace.jpg" alt="" loading="lazy" width="1280" height="720">
+        <button class="play" type="button" aria-label="Дивитися відеоогляд"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg></span></button>
+      </div>
+      <p class="vnote r">Відео відкривається з YouTube після натискання.</p>
     </div>
   </section>
 

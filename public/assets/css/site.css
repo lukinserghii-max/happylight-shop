@@ -255,10 +255,27 @@ p{margin:0}
 .tile-tx small{font-size:12px;color:#e4dccd}
 @media (max-width:1000px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{aspect-ratio:1/1;border-radius:16px}}
-.sortbar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px;font-size:14px;color:var(--ink-muted)}
+.sortbar{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px;font-size:14px;color:var(--ink-muted)}
 .sortbar select{min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--paper-line);background:#fffaf2;color:var(--ink-text);font-size:15px}
+/* режими магазину: плашки ↔ сторінка розділу */
+#shop:not(.in-cat) .chips,#shop:not(.in-cat) .sortbar,#shop:not(.in-cat) .groups{display:none}
+#shop.in-cat .tiles{display:none}
+#shop.in-cat .grp{margin-top:14px}
+#shop.in-cat .chip[data-cat="all"]{background:var(--amber);border-color:var(--amber);color:#1a1307}
+/* відеоогляд: YouTube вантажиться лише після натискання */
+.vid{background:var(--ink)}
+.vbox{position:relative;margin-top:40px;aspect-ratio:16/9;max-width:100%;border-radius:24px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.vbox img,.vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+.vbox .play{position:absolute;inset:0;display:grid;place-items:center;border:0;background:linear-gradient(180deg,rgba(14,16,32,.1),rgba(14,16,32,.55));cursor:pointer;color:#1a1307}
+.vbox .play span{display:grid;place-items:center;width:clamp(64px,8vw,96px);height:clamp(64px,8vw,96px);border-radius:50%;background:var(--amber);box-shadow:0 0 0 12px rgba(242,180,90,.25);transition:transform .3s var(--ease)}
+.vbox .play:hover span{transform:scale(1.08)}
+.vbox .play svg{width:40%;height:40%;margin-left:6%}
+.vnote{margin-top:12px;font-size:13px;color:var(--muted)}
+.cats-back{margin-right:auto;min-height:44px;padding:10px 16px;border-radius:999px;border:0;background:var(--ink-text);color:var(--paper);font:600 15px var(--body);cursor:pointer}
+.cats-back:hover{background:#2c2a3c}
 /* групи товарів за розділами */
-.groups{scroll-margin-top:calc(var(--topbar) + 76px)}
+.groups{scroll-margin-top:calc(var(--topbar) + 132px)}
+.tiles{scroll-margin-top:calc(var(--topbar) + 16px)}
 .grp{margin-top:34px;scroll-margin-top:calc(var(--topbar) + 80px)}
 .grp-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding-bottom:12px;border-bottom:1px solid var(--paper-line)}
 .grp-h h3{font:700 clamp(20px,2.2vw,28px)/1.15 var(--display)}

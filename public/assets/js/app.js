@@ -98,6 +98,16 @@
   hero.addEventListener('pointerleave', () => hero.classList.remove('peek'));
   if (reduced()) setLight(true); else setTimeout(() => { if (!hero.classList.contains('on')) setLight(true, true); }, 1100);
 
+  // ---------- відеоогляд: iframe YouTube лише після натискання (без запитів до Google до цього) ----------
+  $$('[data-yt]').forEach(box => {
+    $('.play', box)?.addEventListener('click', () => {
+      const id = box.dataset.yt;
+      if (!/^[\w-]{11}$/.test(id)) return;
+      const f = el('iframe', { src: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`, title: 'Відеоогляд HappyLight', allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen', referrerpolicy: 'strict-origin-when-cross-origin' });
+      box.textContent = ''; box.append(f); f.focus();
+    });
+  });
+
   // ---------- кошик: стан ----------
   /** @type {{id:string, vi:number, ai:number[], q:number}[]} */
   let cart = store.get('hl-cart-v1', []);
@@ -160,7 +170,7 @@
   function hideDlg(d = openDlg, restore = true) {
     if (!d) return;
     d.classList.remove('open');
-    if (d === sheet && location.hash.startsWith('#p-')) { try { history.replaceState(null, '', location.pathname + location.search); } catch { /* без історії */ } }
+    if (d === sheet && location.hash.startsWith('#p-')) { try { history.replaceState(null, '', location.pathname + location.search + (curCat !== 'all' ? '#cat-' + curCat : '')); } catch { /* без історії */ } }
     openDlg = null;
     scrim.classList.remove('on'); setTimeout(() => { if (!openDlg) scrim.hidden = true; }, 350);
     document.body.classList.remove('lock');
@@ -281,28 +291,29 @@
     g.append(gr);
     return g;
   }
+  // два режими магазину, як на старому сайті: плашки розділів → сторінка розділу з товарами
+  const shopEl = $('#shop');
   function renderGrid() {
     grid.textContent = '';
-    const frag = document.createDocumentFragment();
-    if (curCat === 'all') {
-      // у загальному вигляді товар показуємо лише в першому його розділі, без дублів
-      DB.cats.forEach(c => {
-        const list = inCat(c.id).filter(p => p.cats[0] === c.id);
-        if (list.length) frag.append(group(c, list, true));
-      });
-    } else {
-      const c = DB.cats.find(x => x.id === curCat);
-      if (c) frag.append(group(c, inCat(c.id), false));
-    }
-    grid.append(frag);
-    $$('.chip', chips).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.cat === curCat)));
-    $$('.tile', tiles).forEach(t => t.setAttribute('aria-pressed', String(t.dataset.cat === curCat)));
+    const c = DB.cats.find(x => x.id === curCat);
+    if (c) grid.append(group(c, inCat(c.id), false));
+    shopEl.classList.toggle('in-cat', !!c);
+    $$('.chip', chips).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.cat === curCat)));
   }
-  function setCat(id, scroll) {
+  const catHash = id => (id === 'all' ? '#shop' : '#cat-' + id);
+  function setCat(id, scroll, push = true) {
+    if (id !== 'all' && !DB.cats.some(c => c.id === id)) id = 'all';
     curCat = id; renderGrid();
-    if (scroll) grid.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
-    const chip = $(`.chip[data-cat="${id}"]`, chips); chip?.scrollIntoView({ block: 'nearest', inline: 'center' });
+    if (push && location.hash !== catHash(id)) { try { history.pushState({ cat: id }, '', catHash(id)); } catch { /* без історії */ } }
+    if (scroll) (id === 'all' ? $('[data-tiles]') : grid).scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+    $(`.chip[data-cat="${id}"]`, chips)?.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
+  // кнопка «Назад» у браузері повертає до плашок або попереднього розділу
+  addEventListener('popstate', () => {
+    const m = location.hash.match(/^#cat-([\w-]+)$/);
+    const id = m ? m[1] : 'all';
+    if (id !== curCat) setCat(id, true, false);
+  });
   // плашки розділів: фото, назва, кількість, «від N грн»
   const tiles = $('[data-tiles]');
   function renderTiles() {
@@ -319,12 +330,13 @@
   }
   function renderChips() {
     chips.textContent = '';
-    const mk = (id, label, n) => el('button', { class: 'chip', type: 'button', dataset: { cat: id }, 'aria-pressed': 'false', onclick: () => setCat(id, false) }, [label, el('span', { class: 'c', text: String(n) })]);
-    chips.append(mk('all', 'Усі', DB.products.length));
+    const mk = (id, label, n) => el('button', { class: 'chip', type: 'button', dataset: { cat: id }, 'aria-pressed': 'false', onclick: () => setCat(id, id === 'all') }, [label, el('span', { class: 'c', text: String(n) })]);
+    chips.append(mk('all', '← Усі розділи', DB.cats.length));
     DB.cats.forEach(c => chips.append(mk(c.id, c.short, DB.products.filter(p => p.cats.includes(c.id)).length)));
     const mc = $('[data-menu-cats]'); mc.textContent = '';
-    DB.cats.forEach(c => mc.append(el('a', { href: '#shop', text: c.short, onclick: () => { closeMenu(); setCat(c.id, true); } })));
+    DB.cats.forEach(c => mc.append(el('a', { href: '#cat-' + c.id, text: c.short, onclick: e => { e.preventDefault(); closeMenu(); setCat(c.id, true); } })));
   }
+  $('[data-cats-back]').addEventListener('click', () => setCat('all', true));
   $('[data-sort]').addEventListener('change', e => { sortMode = e.target.value; renderGrid(); });
 
   // ---------- конфігуратор ----------
@@ -623,8 +635,10 @@
       cartValid(); renderBadges();
       renderTiles(); renderChips(); renderGrid();
       if (cfgProducts().length) renderCfg(); else $('#build').hidden = true;
+      const cm = location.hash.match(/^#cat-([\w-]+)$/);
+      if (cm) setCat(cm[1], true, false);
       const m = location.hash.match(/^#p-([\w-]+)$/);
-      if (m && byId.has(m[1])) openProduct(m[1]);
+      if (m && byId.has(m[1])) { const pc = byId.get(m[1]).cats[0]; setCat(pc, false, false); openProduct(m[1]); }
     } catch (e) {
       $('[data-empty]').hidden = false;
       $('#build').hidden = true;
