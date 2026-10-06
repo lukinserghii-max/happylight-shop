@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # адмінка працює лише на Cloudflare (потрібні функції й вхід), у демо її не публікуємо
+      - run: rm -rf public/admin
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public

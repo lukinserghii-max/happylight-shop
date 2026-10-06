@@ -4,16 +4,13 @@
  * Секрети лише в змінних середовища Cloudflare: TG_BOT_TOKEN, TG_CHAT_ID (у коді й репозиторії їх немає).
  */
 
-interface Env {
-  TG_BOT_TOKEN: string;
-  TG_CHAT_ID: string;
-  ASSETS: { fetch: (req: Request | string) => Promise<Response> };
-}
+import { loadCatalog, type Env as BaseEnv } from '../../lib/catalog';
+
+type Env = BaseEnv & { TG_BOT_TOKEN: string; TG_CHAT_ID: string };
 
 interface Variant { l: string; p: number | null; o: number | null; m: number | null; n: number | null }
 interface AddonOpt { l: string; p: number }
-interface Product { id: string; name: string; price: number | null; variants: Variant[]; addons: { t: string; o: AddonOpt[] }[] }
-interface Catalog { products: Product[] }
+interface Product { id: string; name: string; price: number | null; variants: Variant[]; addons: { t: string; o: AddonOpt[] }[]; hidden?: boolean }
 
 interface OrderItem { id: string; vi: number; ai: number[]; q: number }
 interface OrderIn {
@@ -104,10 +101,10 @@ async function handlePost({ request, env }: Ctx): Promise<Response> {
   if (bad) return json(400, { ok: false, error: bad });
 
   // каталог читаємо з власних статичних файлів, ціни від клієнта не беремо
-  const catRes = await env.ASSETS.fetch(new URL('/data/catalog.json', request.url).toString());
-  if (!catRes.ok) return json(500, { ok: false, error: 'catalog' });
-  const catalog = (await catRes.json()) as Catalog;
-  const byId = new Map(catalog.products.map(p => [p.id, p]));
+  // каталог той самий, що бачить покупець: KV з адмінки або запасний статичний JSON
+  let products: Product[];
+  try { products = (await loadCatalog(env, request.url)).data.products; } catch { return json(500, { ok: false, error: 'catalog' }); }
+  const byId = new Map(products.filter(p => !p.hidden).map(p => [p.id, p]));
 
   let total = 0;
   const lines: string[] = [];

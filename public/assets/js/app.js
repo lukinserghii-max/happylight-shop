@@ -319,7 +319,7 @@
   function renderTiles() {
     tiles.textContent = '';
     // сезонний розділ (новорічні фігури) виділяємо великою плашкою першим
-    const FEATURED = 'fig';
+    const FEATURED = (DB.site && 'featured' in DB.site) ? DB.site.featured : 'fig';
     const ordered = [...DB.cats].sort((a, b) => (b.id === FEATURED) - (a.id === FEATURED));
     ordered.forEach(c => {
       const list = inCat(c.id);
@@ -630,13 +630,25 @@
     ]));
   }
 
+  // налаштування з адмінки: відео YouTube
+  function applySite(site) {
+    const box = $('[data-yt]');
+    if (!box || !('video' in site)) return;
+    if (/^[\w-]{11}$/.test(site.video)) box.dataset.yt = site.video;
+    else $('#video').hidden = true;
+  }
+
   // ---------- старт: каталог ----------
   async function boot() {
     try {
-      const res = await fetch('data/catalog.json', { cache: 'no-cache' });
+      // спершу живий каталог з адмінки (Cloudflare), інакше статичний файл (демо на GitHub Pages)
+      let res = await fetch('api/catalog', { cache: 'no-cache' }).catch(() => null);
+      if (!res || !res.ok || !(res.headers.get('Content-Type') || '').includes('json')) res = await fetch('data/catalog.json', { cache: 'no-cache' });
       if (!res.ok) throw new Error('catalog ' + res.status);
       DB = await res.json();
+      DB.products = DB.products.filter(p => !p.hidden);
       DB.products.forEach(p => byId.set(p.id, p));
+      applySite(DB.site || {});
       if (DB.demo) document.body.prepend(el('div', { class: 'demo-bar', role: 'note', text: 'Демо для погодження: каталог тимчасовий, частина цін і фото умовні' }));
       cartValid(); renderBadges();
       renderTiles(); renderChips(); renderGrid();

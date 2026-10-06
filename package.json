@@ -4,10 +4,13 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test:order": "tsx tools/order.test.ts"
+    "test:order": "tsx tools/order.test.ts",
+    "test:access": "tsx tools/access.test.ts"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
+    "tsx": "4.19.2",
     "typescript": "5.6.3",
-    "tsx": "4.19.2"
+    "wrangler": "^3.114.17"
   }
 }
