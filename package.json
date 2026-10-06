@@ -1,0 +1,13 @@
+{
+  "name": "happylight-shop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:order": "tsx tools/order.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3",
+    "tsx": "4.19.2"
+  }
+}

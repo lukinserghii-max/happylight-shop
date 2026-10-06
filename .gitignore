@@ -1,0 +1,16 @@
+.env
+.env.*
+*.pem
+*.key
+review/
+audit/
+raw/
+*.zip
+*.log
+node_modules/
+.DS_Store
+Thumbs.db
+design-package*.md
+.dev.vars
+.wrangler/
+dist/
