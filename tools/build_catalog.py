@@ -96,7 +96,8 @@ def build(snap: Path, public: Path) -> dict[str, Any]:
                 variants.append({"l": label, "p": v.get("price"), "o": v.get("old"), "m": metres, "n": count})
             price = min([v["p"] for v in variants if v["p"]] or [p.get("price") or 0])
             # одна позиція може бути в кількох категоріях (наприклад, «без ламп»)
-            key = f"{name}|{price}"
+            # товари без ціни в картці (аксесуари) розрізняємо ще й за описом
+            key = f"{name}|{price}" + ("" if price else f"|{(p.get('descr') or '')[:60]}")
             if key in by_key:
                 by_key[key]["cats"].append(cid)
                 continue
@@ -107,14 +108,25 @@ def build(snap: Path, public: Path) -> dict[str, Any]:
             if img_file and (snap / "img" / img_file).exists():
                 shutil.copyfile(snap / "img" / img_file, out_img / f"{pid}.webp")
                 img_rel = f"assets/img/p/{pid}.webp"
+            # аксесуари: ціна й одиниця лише в тексті картки («Ціна - 20 грн за 1 метр»)
+            unit = ""
+            if not variants and not p.get("price"):
+                m = re.search(r"Ціна\s*[-–—:]\s*(\d[\d\s]*)\s*грн\s*(?:за\s*([^.]+))?", p.get("text") or p.get("descr") or "")
+                if m:
+                    price = int(re.sub(r"\s", "", m.group(1)))
+                    unit = (m.group(2) or "").strip()
             addons = []
             for a in p.get("addons") or []:
+                # «Кількість» на старому сайті дублює лічильник кошика й має інші ціни: не переносимо
+                if re.match(r"^\s*(кількість|количество)", a.get("title") or "", re.I):
+                    continue
                 opts = [norm_addon_option(o) for o in a.get("options") or []]
                 if opts:
                     addons.append({"t": (a.get("title") or "Опція").strip(), "o": opts})
             item: dict[str, Any] = {
                 "id": pid, "cats": [cid], "name": name,
-                "descr": re.sub(r"\s+", " ", p.get("descr") or "").strip(),
+                "descr": re.sub(r"\s*Ціна\s*[-–—:].*$", "", re.sub(r"\s+", " ", p.get("descr") or "")).strip(),
+                "unit": unit,
                 "img": img_rel, "price": price or None,
                 "old": (variants[0]["o"] if variants else p.get("old")) or None,
                 "vt": (p.get("editionTitle") or "Варіант").strip() if variants else "",

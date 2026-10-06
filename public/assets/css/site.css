@@ -269,6 +269,7 @@ p{margin:0}
 .band .w{display:inline-block;--kc:clamp(0,(var(--k,0) - var(--th,0))*2.6,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*.5em))}
 .band p,.band .row{opacity:clamp(0,(var(--k,0) - .6)*3,1)}
 .band .row{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+.band .btn{text-shadow:none}
 .f1{top:18vh;--sa:.82}
 .f2{bottom:12vh;--sa:.74}
 .film-static{display:none}

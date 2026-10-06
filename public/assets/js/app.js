@@ -115,6 +115,7 @@
   function describe(p, vi, ai) {
     const parts = [];
     if (p.variants.length) parts.push(p.variants[vi].l);
+    if (p.unit) parts.push(`ціна за ${p.unit}`);
     // опцію показуємо, якщо її змінили з типової або вона платна
     p.addons.forEach((a, i) => { const j = ai[i] ?? 0; const o = a.o[j]; if (o && (j > 0 || o.p > 0)) parts.push(`${a.t}: ${o.l}`); });
     return parts.join(' · ');
@@ -218,7 +219,7 @@
     const img = $('[data-p-img]', sheet);
     if (p.img) { img.src = p.img; img.alt = prettyName(p.name); img.hidden = false; } else img.hidden = true;
     $('[data-p-name]', sheet).textContent = prettyName(p.name);
-    $('[data-p-descr]', sheet).textContent = p.descr || '';
+    $('[data-p-descr]', sheet).textContent = [p.descr, p.unit ? `Ціна вказана за ${p.unit}.` : ''].filter(Boolean).join(' ');
     const vbox = $('[data-p-variants]', sheet); vbox.textContent = '';
     if (p.variants.length > 1) {
       vbox.append(el('div', { class: 'field' }, [p.vt || 'Варіант']));
@@ -250,7 +251,7 @@
     const nameBtn = el('button', { type: 'button', text: prettyName(p.name) });
     nameBtn.addEventListener('click', () => openProduct(p.id, nameBtn));
     const cat = DB.cats.find(c => c.id === p.cats[0]);
-    const meta = many ? `${p.variants.length} ${p.vt ? (p.vt.toLowerCase().startsWith('довжин') ? 'варіантів довжини' : 'варіантів') : 'варіантів'}` : (p.descr || '');
+    const meta = p.unit ? `Ціна за ${p.unit}${p.descr ? ' · ' + p.descr : ''}` : many ? `${p.variants.length} ${p.vt ? (p.vt.toLowerCase().startsWith('довжин') ? 'варіантів довжини' : 'варіантів') : 'варіантів'}` : (p.descr || '');
     return el('article', { class: 'card' }, [
       el('div', { class: 'im' }, [p.img ? el('img', { src: p.img, alt: '', loading: 'lazy', width: 800, height: 800 }) : null, showTag && cat ? el('span', { class: 'tag', text: cat.short }) : null]),
       el('div', { class: 'bd' }, [el('h3', {}, [nameBtn]), meta ? el('p', { class: 'meta', text: meta }) : null, el('div', { class: 'ft' }, [price, addBtn])])
