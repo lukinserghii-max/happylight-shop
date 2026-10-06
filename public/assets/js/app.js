@@ -318,12 +318,17 @@
   const tiles = $('[data-tiles]');
   function renderTiles() {
     tiles.textContent = '';
-    DB.cats.forEach(c => {
+    // сезонний розділ (новорічні фігури) виділяємо великою плашкою першим
+    const FEATURED = 'fig';
+    const ordered = [...DB.cats].sort((a, b) => (b.id === FEATURED) - (a.id === FEATURED));
+    ordered.forEach(c => {
       const list = inCat(c.id);
       if (!list.length) return;
       const cover = list.find(p => p.img)?.img;
-      tiles.append(el('button', { class: 'tile', type: 'button', dataset: { cat: c.id }, 'aria-pressed': 'false', onclick: () => setCat(c.id, true) }, [
+      const hot = c.id === FEATURED;
+      tiles.append(el('button', { class: hot ? 'tile tile-hot' : 'tile', type: 'button', dataset: { cat: c.id }, 'aria-pressed': 'false', onclick: () => setCat(c.id, true) }, [
         cover ? el('img', { src: cover, alt: '', loading: 'lazy', width: 800, height: 800 }) : null,
+        hot ? el('span', { class: 'tile-badge', text: 'Сезон' }) : null,
         el('span', { class: 'tile-tx' }, [el('b', { text: c.short }), el('small', { class: 'num', text: `${list.length} шт · від ${money(fromPrice(list))}` })])
       ]));
     });

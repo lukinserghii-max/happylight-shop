@@ -29,6 +29,7 @@ CATS: list[tuple[str, str, str, str]] = [
     ("/page30939089.html", "lamps", "Лампочки", "Лампочки"),
     ("/accessories", "acc", "Аксесуари для монтажу", "Аксесуари"),
     ("/lihtari", "lights", "Ліхтарі та powerbank", "Ліхтарі"),
+    ("/figury", "fig", "Новорічні фігури", "Новорічні фігури"),
 ]
 CFG_FAMILIES = {"r25", "f4", "m4", "m1"}
 

@@ -253,8 +253,12 @@ p{margin:0}
 .tile-tx{position:absolute;left:14px;right:14px;bottom:12px;display:grid;gap:4px;color:var(--text);text-shadow:0 1px 4px rgba(0,0,0,.8)}
 .tile-tx b{font:700 clamp(15px,1.4vw,19px)/1.15 var(--display)}
 .tile-tx small{font-size:12px;color:#e4dccd}
+.tile-hot{grid-column:span 2;grid-row:span 2;aspect-ratio:auto;min-height:100%;box-shadow:0 0 0 2px var(--amber)}
+.tile-hot .tile-tx b{font-size:clamp(22px,2.6vw,34px)}
+.tile-hot .tile-tx small{font-size:14px}
+.tile-badge{position:absolute;left:14px;top:14px;padding:7px 12px;border-radius:999px;background:var(--amber);color:#1a1307;font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
 @media (max-width:1000px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{aspect-ratio:1/1;border-radius:16px}}
+@media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{aspect-ratio:1/1;border-radius:16px}.tile-hot{grid-row:auto;aspect-ratio:2/1.15}}
 .sortbar{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px;font-size:14px;color:var(--ink-muted)}
 .sortbar select{min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--paper-line);background:#fffaf2;color:var(--ink-text);font-size:15px}
 /* режими магазину: плашки ↔ сторінка розділу */
