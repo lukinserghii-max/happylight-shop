@@ -36,7 +36,7 @@
 
   const TG = 'https://t.me/zhukbogdan';
   const PHONE = '+380 63 710 06 36';
-  const GARLAND_CATS = new Set(['r25', 'f4', 'm4', 'm1', 'belt', 'loppy']);
+  const GARLAND_CATS = new Set(['r25', 'f4', 'f8', 'm4', 'm1', 'belt', 'loppy']);
 
   let DB = { cats: [], products: [] };
   const byId = new Map();
@@ -230,6 +230,7 @@
     if (p.img) { img.src = p.img; img.alt = prettyName(p.name); img.hidden = false; } else img.hidden = true;
     $('[data-p-name]', sheet).textContent = prettyName(p.name);
     $('[data-p-descr]', sheet).textContent = [p.descr, p.unit ? `Ціна вказана за ${p.unit}.` : ''].filter(Boolean).join(' ');
+    const more = $('[data-p-link]', sheet); if (more) more.href = 'tovar/' + encodeURIComponent(p.id) + '/';
     const vbox = $('[data-p-variants]', sheet); vbox.textContent = '';
     if (p.variants.length > 1) {
       vbox.append(el('div', { class: 'field' }, [p.vt || 'Варіант']));

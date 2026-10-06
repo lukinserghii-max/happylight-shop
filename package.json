@@ -5,7 +5,10 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test:order": "tsx tools/order.test.ts",
-    "test:access": "tsx tools/access.test.ts"
+    "test:access": "tsx tools/access.test.ts",
+    "build:pages": "tsx tools/build_pages.ts",
+    "check:pages": "tsx tools/build_pages.ts --check",
+    "test:seo": "tsx tools/seo.test.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260702.1",

@@ -20,6 +20,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # SEO-сторінки мають відповідати каталогу (npm run build:pages)
+      - run: npx -y tsx@4.19.2 tools/build_pages.ts --check
       - uses: actions/configure-pages@v5
       # адмінка працює лише на Cloudflare (потрібні функції й вхід), у демо її не публікуємо
       - run: rm -rf public/admin

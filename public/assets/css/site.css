@@ -364,11 +364,14 @@ p{margin:0}
 @media (max-width:860px){.b2b{grid-template-columns:1fr}.b2b img{max-height:320px}}
 
 footer{padding:44px var(--gut) calc(48px + var(--tabbar));background:var(--ink);color:var(--muted);font-size:15px;border-top:1px solid var(--line)}
-footer .wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+footer .wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr);gap:24px}
+footer .foot-cats ul{list-style:none;margin:0;padding:0;columns:2;column-gap:16px;line-height:1.9}
+footer .foot-cats li{break-inside:avoid}
 footer h3{font:400 12px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
 footer p{line-height:1.7}
 footer a{text-decoration:none}
 footer a:hover{color:var(--text)}
+@media (max-width:1000px){footer .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){footer .wrap{grid-template-columns:1fr}}
 
 /* ============ діалог товару та кошик ============ */
@@ -460,3 +463,4 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
 /* плашка демо-каталогу (зникає, коли в catalog.json немає "demo") */
 .demo-bar{position:fixed;left:50%;top:calc(var(--topbar) + env(safe-area-inset-top,0px) + 8px);transform:translateX(-50%);z-index:59;padding:8px 14px;border-radius:999px;background:#b4332a;color:#fff;font:600 13px/1.2 var(--body);max-width:calc(100% - 32px);text-align:center;pointer-events:none}
+.p-more{display:inline-block;margin:-4px 0 12px;font-size:14px;color:var(--brown)}

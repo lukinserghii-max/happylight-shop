@@ -13,6 +13,8 @@ export interface Env {
   ACCESS_AUD?: string;
   ADMIN_EMAILS?: string;
   DEV_NO_ACCESS?: string;
+  /** Адреса сайту для canonical, sitemap і розмітки (https://…/). Без неї — адреса запиту. */
+  SITE_URL?: string;
 }
 
 export interface Variant { l: string; p: number | null; o: number | null; m: number | null; n: number | null }
