@@ -33,6 +33,30 @@ CATS: list[tuple[str, str, str, str]] = [
 CFG_FAMILIES = {"r25", "f4", "m4", "m1"}
 
 
+FIX_TITLES = {
+    "запас провода к розетке": "Запас дроту до розетки",
+    "запасные лампочки": "Запасні лампочки",
+    "цвет провода": "Колір дроту",
+    "регулиювання яскравості": "Регулювання яскравості",
+    "регулятор яскравості(для ламп розжарювання)": "Регулятор яскравості (для ламп розжарювання)",
+    "регулятор яскравості( для ламп розжарювання)": "Регулятор яскравості (для ламп розжарювання)",
+}
+FIX_LABELS = {"Черный": "Чорний", "Белый": "Білий", "2м": "2 м", "З меререхтінням": "З мерехтінням", "Без меререхтіння": "Без мерехтіння"}
+
+
+def fix_addon(title: str, opts: list[dict[str, Any]]) -> tuple[str, list[dict[str, Any]]]:
+    t = FIX_TITLES.get(title.strip().lower(), title.strip())
+    for o in opts:
+        o["l"] = FIX_LABELS.get(o["l"], o["l"])
+    # на старому сайті «Колір дроту» інколи містить колір світіння
+    if re.match(r"^колір дроту$", t, re.I) and any(re.search(r"холодн|тепл", o["l"], re.I) for o in opts):
+        t = "Колір світіння"
+    # для кольору та мерехтіння «Обрати» не має сенсу: типовим стає перший реальний варіант
+    if re.match(r"^(колір|мерехтіння)", t, re.I):
+        opts = [o for o in opts if o["l"] != "Не потрібно"] or opts
+    return t, opts
+
+
 def plural(n: int, one: str, few: str, many: str) -> str:
     """Українська множина: 1 лампа, 2 лампи, 5 ламп."""
     if n % 10 == 1 and n % 100 != 11:
@@ -58,7 +82,7 @@ def norm_addon_option(text: str) -> dict[str, Any]:
     t = text.strip()
     if t.lower() in {"обрати", "выбрать", "оберіть"}:
         return {"l": "Не потрібно", "p": 0}
-    m = re.match(r"^(.*?)\s*[-–—]\s*(\d[\d\s]*)\s*(?:грн\.?)?\s*$", t)
+    m = re.match(r"^(.*?)\s*[-–—]\s*(\d[\d\s]*)\s*(?:грн\.?)?\s*$", t) or re.match(r"^(.*?)\s+(\d[\d\s]*)\s*грн\.?\s*$", t)
     label, price = (m.group(1), int(re.sub(r"\s", "", m.group(2)))) if m else (t, 0)
     label = re.sub(r"(\d)\.(\d)", r"\1,\2", label).strip()
     label = label[:1].upper() + label[1:]
@@ -121,8 +145,23 @@ def build(snap: Path, public: Path) -> dict[str, Any]:
                 if re.match(r"^\s*(кількість|количество)", a.get("title") or "", re.I):
                     continue
                 opts = [norm_addon_option(o) for o in a.get("options") or []]
-                if opts:
-                    addons.append({"t": (a.get("title") or "Опція").strip(), "o": opts})
+                if not opts:
+                    continue
+                title, opts = fix_addon(a.get("title") or "Опція", opts)
+                # «Довжина гірлянди» в Profi-light: це повна ціна за довжину, а не доплата → робимо варіантами
+                if re.match(r"^довжина", title, re.I) and not variants:
+                    for o in opts:
+                        mm = re.match(r"^(\d+)\s*м", o["l"])
+                        if o["p"] and mm:
+                            variants.append({"l": f"{mm.group(1)} м", "p": o["p"], "o": None, "m": int(mm.group(1)), "n": None})
+                    if variants:
+                        price = min(v["p"] for v in variants)
+                        p["editionTitle"] = "Довжина"
+                    continue
+                addons.append({"t": title, "o": opts})
+            if not price:
+                print(f"! без ціни, пропущено: {name}", file=sys.stderr)
+                continue
             item: dict[str, Any] = {
                 "id": pid, "cats": [cid], "name": name,
                 "descr": re.sub(r"\s*Ціна\s*[-–—:].*$", "", re.sub(r"\s+", " ", p.get("descr") or "")).strip(),

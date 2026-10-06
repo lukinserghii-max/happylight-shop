@@ -359,7 +359,7 @@
     const f = FAM[cs.fam];
     const svg = $('[data-scene-svg]'); svg.textContent = '';
     const out = cs.place === 'out';
-    const colorAddon = p.addons.findIndex(a => /^колір$/i.test(a.t.trim()));
+    const colorAddon = p.addons.findIndex(a => /^колір( дроту)?$/i.test(a.t.trim()));
     const whiteWire = colorAddon >= 0 && /біл/i.test(p.addons[colorAddon].o[cs.ai[colorAddon]]?.l || '');
     const dimAddon = p.addons.findIndex(a => /яскрав/i.test(a.t));
     const hasDim = dimAddon >= 0 && cs.ai[dimAddon] > 0;
