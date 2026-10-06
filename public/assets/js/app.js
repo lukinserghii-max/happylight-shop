@@ -257,17 +257,65 @@
       el('div', { class: 'bd' }, [el('h3', {}, [nameBtn]), meta ? el('p', { class: 'meta', text: meta }) : null, el('div', { class: 'ft' }, [price, addBtn])])
     ]);
   }
+  // сортування: вулична → внутрішня, далі за ціною; або за ціною / назвою
+  let sortMode = 'rec';
+  const isIndoor = p => /внутр/i.test(p.name);
+  const SORTS = {
+    rec: (a, b) => (isIndoor(a) - isIndoor(b)) || ((a.price || 0) - (b.price || 0)),
+    asc: (a, b) => (a.price || 0) - (b.price || 0),
+    desc: (a, b) => (b.price || 0) - (a.price || 0),
+    name: (a, b) => prettyName(a.name).localeCompare(prettyName(b.name), 'uk')
+  };
+  const inCat = id => DB.products.filter(p => p.cats.includes(id)).sort(SORTS[sortMode]);
+  const fromPrice = list => Math.min(...list.map(p => p.price || Infinity));
+  function group(cat, list, showAllBtn) {
+    const g = el('section', { class: 'grp', 'aria-labelledby': 'g-' + cat.id }, [
+      el('div', { class: 'grp-h' }, [
+        el('h3', { id: 'g-' + cat.id, text: cat.title }),
+        el('span', { class: 'num', text: `${list.length} ${list.length === 1 ? 'товар' : list.length < 5 ? 'товари' : 'товарів'} · від ${money(fromPrice(list))}` }),
+        showAllBtn ? el('button', { class: 'grp-all', type: 'button', text: 'Лише цей розділ →', onclick: () => setCat(cat.id, true) }) : null
+      ])
+    ]);
+    const gr = el('div', { class: 'grid' });
+    list.forEach(p => gr.append(card(p, false)));
+    g.append(gr);
+    return g;
+  }
   function renderGrid() {
-    const list = curCat === 'all' ? DB.products : DB.products.filter(p => p.cats.includes(curCat));
     grid.textContent = '';
     const frag = document.createDocumentFragment();
-    list.forEach(p => frag.append(card(p, curCat === 'all')));
+    if (curCat === 'all') {
+      // у загальному вигляді товар показуємо лише в першому його розділі, без дублів
+      DB.cats.forEach(c => {
+        const list = inCat(c.id).filter(p => p.cats[0] === c.id);
+        if (list.length) frag.append(group(c, list, true));
+      });
+    } else {
+      const c = DB.cats.find(x => x.id === curCat);
+      if (c) frag.append(group(c, inCat(c.id), false));
+    }
     grid.append(frag);
     $$('.chip', chips).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.cat === curCat)));
+    $$('.tile', tiles).forEach(t => t.setAttribute('aria-pressed', String(t.dataset.cat === curCat)));
   }
   function setCat(id, scroll) {
     curCat = id; renderGrid();
-    if (scroll) $('#shop').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth' });
+    if (scroll) grid.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+    const chip = $(`.chip[data-cat="${id}"]`, chips); chip?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+  // плашки розділів: фото, назва, кількість, «від N грн»
+  const tiles = $('[data-tiles]');
+  function renderTiles() {
+    tiles.textContent = '';
+    DB.cats.forEach(c => {
+      const list = inCat(c.id);
+      if (!list.length) return;
+      const cover = list.find(p => p.img)?.img;
+      tiles.append(el('button', { class: 'tile', type: 'button', dataset: { cat: c.id }, 'aria-pressed': 'false', onclick: () => setCat(c.id, true) }, [
+        cover ? el('img', { src: cover, alt: '', loading: 'lazy', width: 800, height: 800 }) : null,
+        el('span', { class: 'tile-tx' }, [el('b', { text: c.short }), el('small', { class: 'num', text: `${list.length} шт · від ${money(fromPrice(list))}` })])
+      ]));
+    });
   }
   function renderChips() {
     chips.textContent = '';
@@ -275,8 +323,9 @@
     chips.append(mk('all', 'Усі', DB.products.length));
     DB.cats.forEach(c => chips.append(mk(c.id, c.short, DB.products.filter(p => p.cats.includes(c.id)).length)));
     const mc = $('[data-menu-cats]'); mc.textContent = '';
-    DB.cats.forEach(c => mc.append(el('a', { href: '#shop', text: c.short, onclick: () => { closeMenu(); setCat(c.id, false); } })));
+    DB.cats.forEach(c => mc.append(el('a', { href: '#shop', text: c.short, onclick: () => { closeMenu(); setCat(c.id, true); } })));
   }
+  $('[data-sort]').addEventListener('change', e => { sortMode = e.target.value; renderGrid(); });
 
   // ---------- конфігуратор ----------
   const FAM = {
@@ -572,7 +621,7 @@
       DB.products.forEach(p => byId.set(p.id, p));
       if (DB.demo) document.body.prepend(el('div', { class: 'demo-bar', role: 'note', text: 'Демо для погодження: каталог тимчасовий, частина цін і фото умовні' }));
       cartValid(); renderBadges();
-      renderChips(); renderGrid();
+      renderTiles(); renderChips(); renderGrid();
       if (cfgProducts().length) renderCfg(); else $('#build').hidden = true;
       const m = location.hash.match(/^#p-([\w-]+)$/);
       if (m && byId.has(m[1])) openProduct(m[1]);

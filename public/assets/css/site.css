@@ -242,6 +242,30 @@ p{margin:0}
 @media (max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card .bd{padding:12px 12px 14px}.card h3{font-size:14px}.card .pr{font-size:16px}.card .add{width:42px;height:42px}}
 .empty{padding:40px 0;color:var(--ink-muted)}
 
+/* плашки розділів */
+.tiles{margin-top:36px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tile{position:relative;display:block;aspect-ratio:4/3;border:0;padding:0;border-radius:20px;overflow:hidden;background:var(--ink);cursor:pointer;text-align:left;isolation:isolate;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;transition:transform 1s var(--ease)}
+.tile::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(14,16,32,0) 35%,rgba(14,16,32,.88) 100%)}
+.tile:hover{transform:translateY(-3px);box-shadow:0 18px 36px -20px rgba(60,40,10,.6)}
+.tile:hover img{transform:scale(1.06)}
+.tile[aria-pressed="true"]{box-shadow:0 0 0 3px var(--amber)}
+.tile-tx{position:absolute;left:14px;right:14px;bottom:12px;display:grid;gap:4px;color:var(--text);text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.tile-tx b{font:700 clamp(15px,1.4vw,19px)/1.15 var(--display)}
+.tile-tx small{font-size:12px;color:#e4dccd}
+@media (max-width:1000px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{aspect-ratio:1/1;border-radius:16px}}
+.sortbar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px;font-size:14px;color:var(--ink-muted)}
+.sortbar select{min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--paper-line);background:#fffaf2;color:var(--ink-text);font-size:15px}
+/* групи товарів за розділами */
+.groups{scroll-margin-top:calc(var(--topbar) + 76px)}
+.grp{margin-top:34px;scroll-margin-top:calc(var(--topbar) + 80px)}
+.grp-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding-bottom:12px;border-bottom:1px solid var(--paper-line)}
+.grp-h h3{font:700 clamp(20px,2.2vw,28px)/1.15 var(--display)}
+.grp-h .num{font-size:13px;color:var(--ink-muted)}
+.grp-all{margin-left:auto;border:0;background:none;color:var(--brown);font:600 14px var(--body);cursor:pointer;min-height:44px}
+.grp-all:hover{text-decoration:underline}
+
 /* умови: доставка, оплата, гарантія */
 .terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:44px}
 .term{padding:26px;border-radius:22px;background:var(--paper-2);border:1px solid var(--paper-line)}
