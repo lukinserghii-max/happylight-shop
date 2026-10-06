@@ -348,6 +348,7 @@
   const FAM = {
     r25: { label: 'Розжарювання 25 Вт', small: 'найтепліше світло, є диммер', glow: '#ffae42', core: '#ffd27a', r: 30, a: .95, fil: true },
     f4: { label: 'Філамент LED 4 Вт', small: 'видно нитку, економні', glow: '#ffbf5e', core: '#ffe2a6', r: 26, a: .85, fil: true },
+    f8: { label: 'Філамент LED 8 Вт', small: 'видно нитку, 8 Вт на лампу', glow: '#ffb84f', core: '#ffdd9a', r: 30, a: .92, fil: true },
     m4: { label: 'Матові LED 4 Вт', small: 'м’яке рівне світло', glow: '#ffd79a', core: '#fff1d6', r: 26, a: .8, fil: false },
     m1: { label: 'Економні LED 1 Вт', small: 'найекономніші', glow: '#ffd79a', core: '#fff3df', r: 18, a: .6, fil: false }
   };
